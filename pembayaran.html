@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pembayaran</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2 style="text-align: center">Menu</h2>
+      <a href="dashboard.html">Halaman Utama</a>
+      <a href="pembayaran.html" class="active">Bayar Hutang</a>
+      <a href="riwayat.html">Tabel Riwayat</a>
+      <div class="logout">
+        <button id="logoutBtn">Keluar</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Bayar Hutang</h1>
+      <form id="bayarForm">
+        <label>Tanggal Bayar</label><br />
+        <input type="date" id="tanggalBayar" required /><br /><br />
+
+        <label>Jumlah Bayar</label><br />
+        <input type="number" id="jumlahBayar" required /><br /><br />
+
+        <label>Keterangan</label><br />
+        <input type="text" id="keterangan" required /><br /><br />
+
+        <button type="submit">Simpan Pembayaran</button>
+      </form>
+    </div>
+
+    <script type="module">
+      import { auth, db } from "./firebase-config.js";
+      import {
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        updateDoc,
+        arrayUnion,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => (window.location.href = "index.html"));
+      });
+
+      const bayarForm = document.getElementById("bayarForm");
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        // Cek role
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists() || userSnap.data().role !== "admin") {
+          alert("Akses ditolak!");
+          window.location.href = "dashboard.html";
+          return;
+        }
+
+        bayarForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const tanggal = document.getElementById("tanggalBayar").value;
+          const jumlah = parseInt(document.getElementById("jumlahBayar").value);
+          const ket = document.getElementById("keterangan").value;
+
+          const docRef = doc(db, "hutang", "dataHutang");
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            await updateDoc(docRef, {
+              totalBayar: (data.totalBayar || 0) + jumlah,
+              riwayat: arrayUnion({
+                tanggal: tanggal,
+                jumlah: jumlah,
+                keterangan: ket,
+                sisa: data.totalHutang - ((data.totalBayar || 0) + jumlah),
+                totalBayar: (data.totalBayar || 0) + jumlah,
+              }),
+            });
+            alert("Pembayaran berhasil disimpan!");
+            bayarForm.reset();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

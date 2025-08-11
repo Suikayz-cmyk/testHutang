@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #17bdff;
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: "Just Another Hand", cursive;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-size: 20px;
+      }
+
+      .login-box {
+        width: 500px;
+        background-color: #badfff;
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      .login-box input {
+        font-family: "Just Another Hand", cursive;
+        width: 250px;
+        padding: 5px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .login-box button {
+        background-color: #17bdff;
+        font-family: "Just Another Hand", cursive;
+        width: 265px;
+        padding: 5px;
+        border-radius: 8px;
+        font-size: 25px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .login-box button:hover {
+        background-color: #0eaee6;
+      }
+
+      .error {
+        color: red;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Pencatatan Hutang HP Wisnu</h1>
+
+      <div class="login-box">
+        <h2>Login Dulu Boss</h2>
+
+        <!--Form Login-->
+        <form id="loginForm">
+          <input type="email" id="email" placeholder="Email" required /><br />
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          /><br />
+          <button type="submit">Login</button>
+        </form>
+        <div class="error" id="errorMsg"></div>
+      </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script type="module">
+      import { auth } from "./firebase-config.js";
+      import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+      const loginForm = document.getElementById("loginForm");
+      const errorMsg = document.getElementById("errorMsg");
+
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            window.location.href = "dashboard.html";
+          })
+          .catch((error) => {
+            errorMsg.textContent = "❌ Login gagal: " + error.message;
+          });
+      });
+    </script>
+  </body>
+</html>

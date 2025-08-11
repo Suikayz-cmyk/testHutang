@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2 style="text-align: center">Menu</h2>
+      <a href="dashboard.html" class="active">Halaman Utama</a>
+      <a href="pembayaran.html">Bayar Hutang</a>
+      <a href="riwayat.html">Tabel Riwayat</a>
+      <div class="logout">
+        <button id="logoutBtn">Keluar</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Dashboard</h1>
+      <p><b>Nama:</b> <span id="nama"></span></p>
+      <p><b>Barang:</b> <span id="barang"></span></p>
+      <p><b>Total Hutang:</b> Rp<span id="totalHutang"></span></p>
+      <p><b>Total Bayar:</b> Rp<span id="totalBayar"></span></p>
+      <p><b>Sisa Hutang:</b> Rp<span id="sisaHutang"></span></p>
+    </div>
+
+    <script type="module">
+      import { auth, db } from "./firebase-config.js";
+      import {
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "index.html";
+        });
+      });
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        // Cek role
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          alert("User tidak terdaftar!");
+          return;
+        }
+        const role = userSnap.data().role;
+
+        // Ambil data hutang shared
+        const hutangRef = doc(db, "hutang", "dataHutang");
+        onSnapshot(hutangRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById("nama").textContent = data.nama;
+            document.getElementById("barang").textContent = data.barang;
+            document.getElementById("totalHutang").textContent =
+              data.totalHutang;
+            document.getElementById("totalBayar").textContent =
+              data.totalBayar || 0;
+            document.getElementById("sisaHutang").textContent =
+              data.totalHutang - (data.totalBayar || 0);
+          }
+        });
+
+        // Sembunyikan menu bayar kalau viewer
+        if (role !== "admin") {
+          document.querySelector('a[href="pembayaran.html"]').style.display =
+            "none";
+        }
+      });
+    </script>
+  </body>
+</html>
