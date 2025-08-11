@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riwayat Pembayaran</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2 style="text-align: center">Menu</h2>
+      <a href="dashboard.html">Halaman Utama</a>
+      <a href="pembayaran.html">Bayar Hutang</a>
+      <a href="riwayat.html" class="active">Tabel Riwayat</a>
+      <div class="logout">
+        <button id="logoutBtn">Keluar</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Riwayat Pembayaran</h1>
+      <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Tanggal Bayar</th>
+            <th>Jumlah Bayar</th>
+            <th>Keterangan</th>
+            <th>Sisa Hutang</th>
+            <th>Total Bayar</th>
+          </tr>
+        </thead>
+        <tbody id="riwayatTable"></tbody>
+      </table>
+    </div>
+
+    <script type="module">
+      import { auth, db } from "./firebase-config.js";
+      import {
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "index.html";
+        });
+      });
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        // Ambil data riwayat dari dokumen shared
+        const hutangRef = doc(db, "hutang", "dataHutang");
+        onSnapshot(hutangRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const riwayat = data.riwayat || [];
+            const tableBody = document.getElementById("riwayatTable");
+            tableBody.innerHTML = "";
+
+            riwayat.forEach((item, index) => {
+              const tr = document.createElement("tr");
+              tr.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${item.tanggal}</td>
+              <td>Rp${item.jumlah.toLocaleString()}</td>
+              <td>${item.keterangan}</td>
+              <td>Rp${item.sisa.toLocaleString()}</td>
+              <td>Rp${item.totalBayar.toLocaleString()}</td>
+            `;
+              tableBody.appendChild(tr);
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

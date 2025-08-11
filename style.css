@@ -1,0 +1,140 @@
+/* Reset dasar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Just Another Hand", cursive;
+  display: flex;
+  background-color: #f8faff;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background-color: #17bdff;
+  color: white;
+  height: 100vh; /* full tinggi layar */
+  padding-top: 20px;
+  position: relative;
+}
+
+.sidebar h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 10px 20px;
+  color: black;
+  text-decoration: none;
+  font-size: 18px;
+  transition: background-color 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #badfff;
+}
+
+.sidebar a.active {
+  background-color: #badfff;
+  font-weight: bold;
+  border-left: 5px solid #3c00ff;
+}
+
+/* Tombol Logout */
+.logout {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.logout button {
+  background-color: #badfff;
+  border: none;
+  padding: 10px 20px;
+  color: black;
+  cursor: pointer;
+  width: 80%;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.logout button:hover {
+  background-color: #3c00ff;
+  color: white;
+}
+
+/* Konten */
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.content h1 {
+  margin-bottom: 20px;
+  font-size: 32px;
+}
+
+.content p {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+/* Form Input */
+form label {
+  font-size: 18px;
+}
+
+form input,
+form button {
+  padding: 8px;
+  margin-top: 5px;
+  font-size: 16px;
+}
+
+form button {
+  background-color: #17bdff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #3c00ff;
+}
+
+/* Tabel Riwayat */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: white;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+}
+
+th {
+  background-color: #17bdff;
+  color: white;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: center;
+  font-size: 16px;
+}
